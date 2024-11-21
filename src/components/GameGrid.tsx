@@ -2,37 +2,12 @@ import React, { useEffect, useState } from "react";
 import apiClient from "../service/api-client";
 import { SimpleGrid } from "@chakra-ui/react";
 import GameCard from "./GameCard";
-
-export interface Platform {
-  id: number;
-  name: string;
-  slug: string;
-  image_background: string;
-}
-
-export interface Game {
-  id: number;
-  metacritic: number;
-  name: string;
-  background_image: string;
-  parent_platforms: { platform: Platform }[];
-}
-
-interface FetchGamesResponse {
-  count: number;
-  results: Game[];
-}
+import useGames from "../hooks/useGames";
+import GameCardSkeleton from "./GameCardSkeleton";
 
 const GameGrid = () => {
-  const [games, setGames] = useState<Game[]>([]);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    apiClient
-      .get<FetchGamesResponse>("/games")
-      .then((res) => setGames(res.data.results))
-      .catch((err) => setError(err.message));
-  }, []);
+  const { games, error, isLoding } = useGames();
+  const skeletons = [1, 2, 3, 4, 5, 6];
 
   return (
     <>
@@ -42,6 +17,8 @@ const GameGrid = () => {
         padding="10px"
         spacing={10}
       >
+        {isLoding &&
+          skeletons.map((skeletons) => <GameCardSkeleton></GameCardSkeleton>)}
         {games.map((game) => (
           <GameCard key={game.id} game={game}></GameCard>
         ))}
